@@ -6,17 +6,18 @@ A cross-platform USB flash drive creator for Windows, Linux, and macOS. Built wi
 
 ### Standard Mode
 - Write ISO/IMG files to USB drives
-- SHA-256 and MD5 checksum verification
-- Optional write verification (read-back compare)
+- SHA-256 and MD5 checksum calculation
+- Post-write verification (reads back written data and compares byte-by-byte to ensure write integrity)
 - Cross-platform: Windows, Linux, macOS
 - Light/Dark/System theme support
 - No telemetry, accounts, or cloud features
 
 ### Advanced Mode
-- Pre-write image validation (detects ISO 9660, MBR, GPT formats)
-- File size vs device capacity warning
-- Auto-eject device after write
-- System notifications on completion
+All Standard features plus:
+- **Pre-write image validation** — Checks source file before writing to confirm it's a valid disk image (ISO 9660, MBR, or GPT format). Click the format name for an explanation of what it means.
+- **Size check** — Warns if image file is larger than USB device capacity
+- **Auto-eject** — Automatically ejects USB device after successful write
+- **Notifications** — System notification when write completes
 
 ## Requirements
 

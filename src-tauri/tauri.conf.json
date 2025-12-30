@@ -14,9 +14,9 @@
       {
         "title": "Gosh USB Creator",
         "width": 700,
-        "height": 720,
+        "height": 820,
         "minWidth": 500,
-        "minHeight": 500,
+        "minHeight": 600,
         "resizable": true,
         "center": true
       }

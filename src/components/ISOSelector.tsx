@@ -1,10 +1,18 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useApp } from "../context/AppContext";
 import type { FileInfo, ImageValidation } from "../types";
 import "./ISOSelector.css";
 
+const FORMAT_INFO: Record<string, string> = {
+  "ISO 9660": "Standard format for optical disc images (CDs, DVDs). Used by most Linux distributions and Windows installation media.",
+  "Disk Image (MBR)": "Master Boot Record — Legacy boot format supporting up to 4 primary partitions and 2TB drives. Compatible with older BIOS systems.",
+  "Disk Image (GPT)": "GUID Partition Table — Modern boot format supporting unlimited partitions and drives larger than 2TB. Required for UEFI boot.",
+  "Unknown": "Format not recognized. The file may still work but could not be validated as a standard disk image.",
+};
+
 export default function ISOSelector() {
   const { state, dispatch } = useApp();
+  const [showFormatInfo, setShowFormatInfo] = useState(false);
 
   // Auto-validate image in advanced mode
   useEffect(() => {
@@ -102,11 +110,24 @@ export default function ISOSelector() {
             {validation && (
               <>
                 <div className={`validation-status ${validation.is_valid ? "valid" : "invalid"}`}>
-                  <span className="validation-format">{validation.format}</span>
+                  <button
+                    type="button"
+                    className="validation-format-btn"
+                    onClick={() => setShowFormatInfo(!showFormatInfo)}
+                    title="Click for more info"
+                  >
+                    {validation.format}
+                    <span className="info-icon">?</span>
+                  </button>
                   <span className="validation-badge">
                     {validation.is_valid ? "Valid" : "Invalid"}
                   </span>
                 </div>
+                {showFormatInfo && (
+                  <div className="format-info-popup">
+                    <p>{FORMAT_INFO[validation.format] || FORMAT_INFO["Unknown"]}</p>
+                  </div>
+                )}
                 {validation.errors.length > 0 && (
                   <ul className="validation-errors">
                     {validation.errors.map((err, i) => (
