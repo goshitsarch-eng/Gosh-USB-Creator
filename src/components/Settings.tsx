@@ -4,6 +4,7 @@ import "./Settings.css";
 
 export default function Settings() {
   const { state, dispatch } = useApp();
+  const isAdvanced = state.mode === "advanced";
 
   return (
     <>
@@ -42,6 +43,34 @@ export default function Settings() {
           </p>
         </div>
       </div>
+
+      {isAdvanced && (
+        <div className="card">
+          <div className="card-header">Post-Write Actions</div>
+          <div className="card-body settings-actions">
+            <label className="settings-checkbox">
+              <input
+                type="checkbox"
+                checked={state.autoEject}
+                onChange={(e) =>
+                  dispatch({ type: "SET_AUTO_EJECT", payload: e.target.checked })
+                }
+              />
+              Auto-eject device after write
+            </label>
+            <label className="settings-checkbox">
+              <input
+                type="checkbox"
+                checked={state.showNotification}
+                onChange={(e) =>
+                  dispatch({ type: "SET_SHOW_NOTIFICATION", payload: e.target.checked })
+                }
+              />
+              Show system notification on completion
+            </label>
+          </div>
+        </div>
+      )}
 
       <div className="card">
         <div className="card-header">About</div>

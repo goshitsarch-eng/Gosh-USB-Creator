@@ -157,3 +157,43 @@ pub async fn open_device_for_read(device_path: &str) -> Result<File, PlatformErr
 
     File::open(device_path).await.map_err(PlatformError::Io)
 }
+
+pub async fn eject_device(device_path: &str) -> Result<(), PlatformError> {
+    // Extract disk number from path
+    let disk_num = device_path
+        .strip_prefix(r"\\.\PhysicalDrive")
+        .ok_or_else(|| PlatformError::Parse("Invalid device path".to_string()))?;
+
+    // Eject all volumes on this disk
+    let output = Command::new("powershell")
+        .args([
+            "-NoProfile",
+            "-Command",
+            &format!(
+                r#"
+                $partitions = Get-Partition -DiskNumber {} -ErrorAction SilentlyContinue
+                foreach ($p in $partitions) {{
+                    $vol = Get-Volume -Partition $p -ErrorAction SilentlyContinue
+                    if ($vol.DriveLetter) {{
+                        $driveLetter = "$($vol.DriveLetter):"
+                        Write-Host "Ejecting $driveLetter"
+                        $null = (New-Object -ComObject Shell.Application).Namespace(17).ParseName($driveLetter).InvokeVerb("Eject")
+                        Start-Sleep -Milliseconds 500
+                    }}
+                }}
+                "#,
+                disk_num
+            ),
+        ])
+        .output()?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(PlatformError::Command(format!(
+            "Failed to eject device: {}",
+            stderr
+        )));
+    }
+
+    Ok(())
+}

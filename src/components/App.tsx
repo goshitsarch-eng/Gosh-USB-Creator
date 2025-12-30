@@ -5,6 +5,7 @@ import VerificationPanel from "./VerificationPanel";
 import DeviceList from "./DeviceList";
 import ProgressBar from "./ProgressBar";
 import Settings from "./Settings";
+import ModeToggle from "./ModeToggle";
 import "./App.css";
 
 type NavItem = "write" | "settings";
@@ -32,14 +33,49 @@ export default function App() {
     dispatch({ type: "SET_WRITE_PHASE", payload: "preparing" });
     dispatch({ type: "SET_WRITE_ERROR", payload: null });
 
+    const devicePath = state.selectedDevice.path;
+
     try {
       const { invoke } = await import("@tauri-apps/api/core");
       await invoke("write_iso_to_device", {
         isoPath: state.selectedFile.path,
-        devicePath: state.selectedDevice.path,
+        devicePath: devicePath,
         verify: state.verifyAfterWrite,
       });
       dispatch({ type: "SET_WRITE_PHASE", payload: "complete" });
+
+      // Post-write actions (Advanced mode only)
+      if (state.mode === "advanced") {
+        // Show notification
+        if (state.showNotification) {
+          try {
+            const { sendNotification, isPermissionGranted, requestPermission } =
+              await import("@tauri-apps/plugin-notification");
+            let hasPermission = await isPermissionGranted();
+            if (!hasPermission) {
+              const permission = await requestPermission();
+              hasPermission = permission === "granted";
+            }
+            if (hasPermission) {
+              sendNotification({
+                title: "Write Complete",
+                body: `Successfully wrote ${state.selectedFile.name} to USB drive.`,
+              });
+            }
+          } catch (e) {
+            console.warn("Notification not available:", e);
+          }
+        }
+
+        // Auto-eject
+        if (state.autoEject) {
+          try {
+            await invoke("eject_device", { devicePath });
+          } catch (e) {
+            console.warn("Failed to eject:", e);
+          }
+        }
+      }
     } catch (error) {
       dispatch({ type: "SET_WRITE_ERROR", payload: String(error) });
     }
@@ -82,6 +118,7 @@ export default function App() {
             </button>
           </li>
         </ul>
+        <ModeToggle />
       </nav>
 
       <main className="main">

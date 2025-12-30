@@ -4,12 +4,19 @@ A cross-platform USB flash drive creator for Windows, Linux, and macOS. Built wi
 
 ## Features
 
+### Standard Mode
 - Write ISO/IMG files to USB drives
 - SHA-256 and MD5 checksum verification
 - Optional write verification (read-back compare)
 - Cross-platform: Windows, Linux, macOS
 - Light/Dark/System theme support
 - No telemetry, accounts, or cloud features
+
+### Advanced Mode
+- Pre-write image validation (detects ISO 9660, MBR, GPT formats)
+- File size vs device capacity warning
+- Auto-eject device after write
+- System notifications on completion
 
 ## Requirements
 
@@ -69,6 +76,16 @@ This license requires:
 - Source code must be provided when distributing modified versions
 - Network use (SaaS) must provide source access
 - No closed-source forks
+
+## Roadmap
+
+Planned features for future releases:
+
+- **Compressed Image Support** - Write `.iso.gz`, `.iso.xz`, `.img.zip` directly without manual extraction
+- **Multi-Device Write** - Clone the same image to multiple USB drives simultaneously
+- **Bootable Validation** - Verify written USB is bootable (BIOS/UEFI detection)
+- **Persistent Volume** - Create persistence partition for Linux live USBs
+- **Ventoy-Style Multi-Boot** - Multiple ISOs on one USB with boot menu
 
 ## Contributing
 

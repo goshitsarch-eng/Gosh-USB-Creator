@@ -176,3 +176,25 @@ pub async fn open_device_for_read(device_path: &str) -> Result<File, PlatformErr
 
     File::open(&raw_path).await.map_err(PlatformError::Io)
 }
+
+pub async fn eject_device(device_path: &str) -> Result<(), PlatformError> {
+    // Extract disk identifier from path (e.g., /dev/disk2 -> disk2)
+    let disk_id = device_path
+        .strip_prefix("/dev/")
+        .or_else(|| device_path.strip_prefix("/dev/r"))
+        .ok_or_else(|| PlatformError::Parse("Invalid device path".to_string()))?;
+
+    let output = Command::new("diskutil")
+        .args(["eject", disk_id])
+        .output()?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(PlatformError::Command(format!(
+            "Failed to eject disk: {}",
+            stderr
+        )));
+    }
+
+    Ok(())
+}

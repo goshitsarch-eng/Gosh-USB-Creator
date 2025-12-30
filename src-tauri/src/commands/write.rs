@@ -164,3 +164,10 @@ pub async fn write_iso_to_device(
 
     Ok(())
 }
+
+#[tauri::command]
+pub async fn eject_device(device_path: String) -> Result<(), String> {
+    platform::eject_device(&device_path)
+        .await
+        .map_err(|e| format!("Failed to eject device: {}", e))
+}

@@ -14,6 +14,13 @@ export interface FileInfo {
   size_human: string;
 }
 
+export interface ImageValidation {
+  is_valid: boolean;
+  format: string;
+  errors: string[];
+  warnings: string[];
+}
+
 export interface WriteProgress {
   phase: "writing" | "verifying";
   bytes_written: number;
@@ -28,6 +35,8 @@ export interface ChecksumProgress {
 }
 
 export type Theme = "light" | "dark" | "system";
+
+export type AppMode = "standard" | "advanced";
 
 export type WritePhase = "idle" | "preparing" | "writing" | "verifying" | "complete" | "error";
 
@@ -45,6 +54,12 @@ export interface AppState {
   writeError: string | null;
   verifyAfterWrite: boolean;
   theme: Theme;
+  mode: AppMode;
+  imageValidation: ImageValidation | null;
+  imageValidationLoading: boolean;
+  // Post-write actions (Advanced mode)
+  autoEject: boolean;
+  showNotification: boolean;
 }
 
 export type AppAction =
@@ -61,4 +76,9 @@ export type AppAction =
   | { type: "SET_WRITE_ERROR"; payload: string | null }
   | { type: "SET_VERIFY_AFTER_WRITE"; payload: boolean }
   | { type: "SET_THEME"; payload: Theme }
+  | { type: "SET_MODE"; payload: AppMode }
+  | { type: "SET_IMAGE_VALIDATION"; payload: ImageValidation | null }
+  | { type: "SET_IMAGE_VALIDATION_LOADING"; payload: boolean }
+  | { type: "SET_AUTO_EJECT"; payload: boolean }
+  | { type: "SET_SHOW_NOTIFICATION"; payload: boolean }
   | { type: "RESET_WRITE" };

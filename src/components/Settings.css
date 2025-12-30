@@ -49,3 +49,9 @@
   color: var(--text-muted);
   margin-top: 4px;
 }
+
+.settings-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

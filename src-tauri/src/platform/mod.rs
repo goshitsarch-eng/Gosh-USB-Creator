@@ -78,3 +78,17 @@ pub async fn open_device_for_read(device_path: &str) -> Result<File, PlatformErr
     #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
     Err(PlatformError::Command("Unsupported platform".to_string()))
 }
+
+pub async fn eject_device(device_path: &str) -> Result<(), PlatformError> {
+    #[cfg(target_os = "linux")]
+    return linux::eject_device(device_path).await;
+
+    #[cfg(target_os = "macos")]
+    return macos::eject_device(device_path).await;
+
+    #[cfg(target_os = "windows")]
+    return windows::eject_device(device_path).await;
+
+    #[cfg(not(any(target_os = "linux", target_os = "macos", target_os = "windows")))]
+    Err(PlatformError::Command("Unsupported platform".to_string()))
+}

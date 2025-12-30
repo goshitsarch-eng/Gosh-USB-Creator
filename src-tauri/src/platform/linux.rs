@@ -168,3 +168,34 @@ pub async fn open_device_for_read(device_path: &str) -> Result<File, PlatformErr
         .await
         .map_err(PlatformError::Io)
 }
+
+pub async fn eject_device(device_path: &str) -> Result<(), PlatformError> {
+    if !device_path.starts_with("/dev/") {
+        return Err(PlatformError::Permission(
+            "Invalid device path".to_string(),
+        ));
+    }
+
+    // First unmount all partitions
+    let _ = unmount_device(device_path).await;
+
+    // Then eject the device
+    let output = Command::new("eject").arg(device_path).output()?;
+
+    if !output.status.success() {
+        // Try with udisksctl as fallback
+        let output = Command::new("udisksctl")
+            .args(["power-off", "-b", device_path])
+            .output()?;
+
+        if !output.status.success() {
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            return Err(PlatformError::Command(format!(
+                "Failed to eject device: {}",
+                stderr
+            )));
+        }
+    }
+
+    Ok(())
+}

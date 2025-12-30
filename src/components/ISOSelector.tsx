@@ -1,10 +1,34 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useApp } from "../context/AppContext";
-import type { FileInfo } from "../types";
+import type { FileInfo, ImageValidation } from "../types";
 import "./ISOSelector.css";
 
 export default function ISOSelector() {
   const { state, dispatch } = useApp();
+
+  // Auto-validate image in advanced mode
+  useEffect(() => {
+    async function validateImage() {
+      if (state.mode !== "advanced" || !state.selectedFile) return;
+      if (state.imageValidation !== null || state.imageValidationLoading) return;
+
+      dispatch({ type: "SET_IMAGE_VALIDATION_LOADING", payload: true });
+      try {
+        const { invoke } = await import("@tauri-apps/api/core");
+        const deviceSize = state.selectedDevice?.size ?? null;
+        const validation: ImageValidation = await invoke("validate_image", {
+          path: state.selectedFile.path,
+          deviceSize,
+        });
+        dispatch({ type: "SET_IMAGE_VALIDATION", payload: validation });
+      } catch (error) {
+        console.error("Failed to validate image:", error);
+      } finally {
+        dispatch({ type: "SET_IMAGE_VALIDATION_LOADING", payload: false });
+      }
+    }
+    validateImage();
+  }, [state.mode, state.selectedFile, state.selectedDevice, state.imageValidation, state.imageValidationLoading, dispatch]);
 
   const selectFile = useCallback(async () => {
     try {
@@ -57,6 +81,9 @@ export default function ISOSelector() {
   };
 
   if (state.selectedFile) {
+    const validation = state.imageValidation;
+    const isAdvanced = state.mode === "advanced";
+
     return (
       <div className="iso-selected">
         <div className="iso-info">
@@ -66,6 +93,38 @@ export default function ISOSelector() {
         <button className="neutral" onClick={clearFile}>
           Clear
         </button>
+
+        {isAdvanced && (
+          <div className="iso-validation">
+            {state.imageValidationLoading && (
+              <span className="validation-loading">Validating...</span>
+            )}
+            {validation && (
+              <>
+                <div className={`validation-status ${validation.is_valid ? "valid" : "invalid"}`}>
+                  <span className="validation-format">{validation.format}</span>
+                  <span className="validation-badge">
+                    {validation.is_valid ? "Valid" : "Invalid"}
+                  </span>
+                </div>
+                {validation.errors.length > 0 && (
+                  <ul className="validation-errors">
+                    {validation.errors.map((err, i) => (
+                      <li key={i}>{err}</li>
+                    ))}
+                  </ul>
+                )}
+                {validation.warnings.length > 0 && (
+                  <ul className="validation-warnings">
+                    {validation.warnings.map((warn, i) => (
+                      <li key={i}>{warn}</li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
     );
   }
