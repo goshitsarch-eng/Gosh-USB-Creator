@@ -62,7 +62,7 @@ export default function App() {
     <div className="app">
       <nav className="sidebar">
         <div className="sidebar-header">
-          <span className="sidebar-title">Gosh USB</span>
+          <span className="sidebar-title">Gosh USB Creator</span>
         </div>
         <ul className="sidebar-nav">
           <li>
