@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.tauri.app/config/2/capability",
+  "identifier": "default",
+  "description": "Default capabilities for Gosh USB Creator",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "dialog:default",
+    "dialog:allow-open",
+    "dialog:allow-ask",
+    "dialog:allow-message",
+    "fs:default",
+    "fs:allow-read",
+    "shell:default",
+    "shell:allow-execute",
+    {
+      "identifier": "fs:allow-read",
+      "allow": [
+        { "path": "**/*" }
+      ]
+    }
+  ]
+}

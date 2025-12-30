@@ -1,0 +1,81 @@
+.device-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.device-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.device-count {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.device-empty {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.device-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.device-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 12px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: left;
+  cursor: pointer;
+}
+
+.device-card:hover:not(:disabled) {
+  border-color: var(--border-strong);
+}
+
+.device-card.selected {
+  border-color: var(--safe);
+  background-color: var(--safe-bg);
+}
+
+.device-card:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.device-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.device-name {
+  font-weight: 500;
+}
+
+.device-size {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.device-path {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.device-mounts {
+  font-size: 11px;
+  color: var(--danger);
+}

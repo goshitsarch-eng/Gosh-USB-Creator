@@ -1,0 +1,68 @@
+.verification-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.verification-row {
+  display: flex;
+  gap: 8px;
+}
+
+.verification-row select {
+  flex: 0 0 120px;
+}
+
+.checksum-result {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checksum-result label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.checksum-value {
+  padding: 8px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 11px;
+  word-break: break-all;
+  user-select: all;
+}
+
+.checksum-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checksum-compare label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.checksum-compare input {
+  font-size: 11px;
+}
+
+.checksum-status {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: var(--radius);
+  align-self: flex-start;
+}
+
+.checksum-status.match {
+  color: var(--safe);
+  background-color: var(--safe-bg);
+}
+
+.checksum-status.mismatch {
+  color: var(--danger);
+  background-color: var(--danger-bg);
+}
