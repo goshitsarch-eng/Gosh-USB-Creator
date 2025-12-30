@@ -1,3 +1,4 @@
+use crate::commands::devices::{format_size, BlockDevice};
 use crate::platform;
 use serde::Serialize;
 use std::time::Instant;
@@ -23,6 +24,8 @@ pub async fn write_iso_to_device(
     verify: bool,
     app: AppHandle,
 ) -> Result<(), String> {
+    let device = require_removable_device(&device_path).await?;
+
     // Unmount the device first
     platform::unmount_device(&device_path)
         .await
@@ -32,7 +35,20 @@ pub async fn write_iso_to_device(
     let metadata = tokio::fs::metadata(&iso_path)
         .await
         .map_err(|e| format!("Failed to read ISO file: {}", e))?;
+    if !metadata.is_file() {
+        return Err("Selected image is not a file".to_string());
+    }
     let total_bytes = metadata.len();
+    if total_bytes == 0 {
+        return Err("Selected image is empty".to_string());
+    }
+    if device.size > 0 && total_bytes > device.size {
+        return Err(format!(
+            "Image size ({}) exceeds device capacity ({})",
+            format_size(total_bytes),
+            format_size(device.size)
+        ));
+    }
 
     // Open source file
     let mut source = File::open(&iso_path)
@@ -167,7 +183,19 @@ pub async fn write_iso_to_device(
 
 #[tauri::command]
 pub async fn eject_device(device_path: String) -> Result<(), String> {
+    let _ = require_removable_device(&device_path).await?;
     platform::eject_device(&device_path)
         .await
         .map_err(|e| format!("Failed to eject device: {}", e))
+}
+
+async fn require_removable_device(device_path: &str) -> Result<BlockDevice, String> {
+    let devices = platform::list_removable_devices()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    devices
+        .into_iter()
+        .find(|device| device.path == device_path)
+        .ok_or_else(|| format!("Device not found or not removable: {}", device_path))
 }

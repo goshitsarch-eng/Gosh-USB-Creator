@@ -3,8 +3,14 @@ import { useApp } from "../context/AppContext";
 import type { BlockDevice } from "../types";
 import "./DeviceList.css";
 
+const REFRESH_INTERVAL_MS = 8000;
+
 export default function DeviceList() {
   const { state, dispatch } = useApp();
+  const isWriting =
+    state.writePhase === "preparing" ||
+    state.writePhase === "writing" ||
+    state.writePhase === "verifying";
 
   const refreshDevices = useCallback(async () => {
     dispatch({ type: "SET_DEVICES_LOADING", payload: true });
@@ -30,19 +36,15 @@ export default function DeviceList() {
   }, [dispatch, state.selectedDevice]);
 
   useEffect(() => {
+    if (isWriting) return;
     refreshDevices();
-    const interval = setInterval(refreshDevices, 3000);
+    const interval = setInterval(refreshDevices, REFRESH_INTERVAL_MS);
     return () => clearInterval(interval);
-  }, [refreshDevices]);
+  }, [refreshDevices, isWriting]);
 
   const selectDevice = (device: BlockDevice) => {
     dispatch({ type: "SET_DEVICE", payload: device });
   };
-
-  const isWriting =
-    state.writePhase === "preparing" ||
-    state.writePhase === "writing" ||
-    state.writePhase === "verifying";
 
   return (
     <div className="device-list">

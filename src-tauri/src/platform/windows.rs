@@ -92,10 +92,7 @@ struct DiskInfo {
 }
 
 pub async fn unmount_device(device_path: &str) -> Result<(), PlatformError> {
-    // Extract disk number from path
-    let disk_num = device_path
-        .strip_prefix(r"\\.\PhysicalDrive")
-        .ok_or_else(|| PlatformError::Parse("Invalid device path".to_string()))?;
+    let disk_num = parse_disk_number(device_path)?;
 
     // Offline the disk to release all volumes
     let output = Command::new("powershell")
@@ -127,11 +124,7 @@ pub async fn unmount_device(device_path: &str) -> Result<(), PlatformError> {
 }
 
 pub async fn open_device_for_write(device_path: &str) -> Result<File, PlatformError> {
-    if !device_path.starts_with(r"\\.\PhysicalDrive") {
-        return Err(PlatformError::Permission(
-            "Invalid device path".to_string(),
-        ));
-    }
+    let _ = parse_disk_number(device_path)?;
 
     match tokio::fs::OpenOptions::new()
         .write(true)
@@ -149,20 +142,13 @@ pub async fn open_device_for_write(device_path: &str) -> Result<File, PlatformEr
 }
 
 pub async fn open_device_for_read(device_path: &str) -> Result<File, PlatformError> {
-    if !device_path.starts_with(r"\\.\PhysicalDrive") {
-        return Err(PlatformError::Permission(
-            "Invalid device path".to_string(),
-        ));
-    }
+    let _ = parse_disk_number(device_path)?;
 
     File::open(device_path).await.map_err(PlatformError::Io)
 }
 
 pub async fn eject_device(device_path: &str) -> Result<(), PlatformError> {
-    // Extract disk number from path
-    let disk_num = device_path
-        .strip_prefix(r"\\.\PhysicalDrive")
-        .ok_or_else(|| PlatformError::Parse("Invalid device path".to_string()))?;
+    let disk_num = parse_disk_number(device_path)?;
 
     // Eject all volumes on this disk
     let output = Command::new("powershell")
@@ -196,4 +182,15 @@ pub async fn eject_device(device_path: &str) -> Result<(), PlatformError> {
     }
 
     Ok(())
+}
+
+fn parse_disk_number(device_path: &str) -> Result<u32, PlatformError> {
+    let disk_num = device_path
+        .strip_prefix(r"\\.\PhysicalDrive")
+        .ok_or_else(|| PlatformError::Parse("Invalid device path".to_string()))?;
+
+    disk_num
+        .trim()
+        .parse::<u32>()
+        .map_err(|_| PlatformError::Parse("Invalid device path".to_string()))
 }
