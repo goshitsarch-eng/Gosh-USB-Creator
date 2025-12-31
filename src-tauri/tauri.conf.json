@@ -63,6 +63,15 @@
     "windows": {
       "webviewInstallMode": {
         "type": "embedBootstrapper"
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": true,
+        "languages": ["English", "German", "French", "Spanish", "Portuguese", "Japanese", "Korean", "SimpChinese", "TradChinese"],
+        "license": "LICENSE",
+        "installerIcon": "icons/icon.ico",
+        "headerImage": "icons/icon.png",
+        "sidebarImage": "icons/icon.png"
       }
     }
   }
