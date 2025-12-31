@@ -51,6 +51,7 @@ sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
 
 ### macOS
 - Xcode Command Line Tools
+- Minimum macOS 10.13 (High Sierra)
 
 ## Building
 
@@ -67,18 +68,40 @@ npm run tauri build
 
 ## Usage
 
-1. **Select ISO** - Click or drag an ISO/IMG file
-2. **Verify checksum** (optional) - Calculate SHA-256 or MD5 and compare
-3. **Select USB device** - Choose the target drive
-4. **Write** - Click "Write to USB" (requires admin privileges)
+1. **Select ISO** — Click or drag an ISO/IMG file into the app
+2. **Verify checksum** (optional) — Calculate SHA-256 or MD5 and compare against expected value
+3. **Select USB device** — Choose the target drive from the detected removable devices
+4. **Write** — Click "Write" and confirm the warning dialog (requires admin privileges)
+
+The device list auto-refreshes every 8 seconds. Writing uses 4 MB blocks for optimal performance.
 
 ## Permissions
 
-Writing to raw block devices requires elevated privileges:
+Writing to raw block devices requires elevated privileges. **The app must be launched with admin rights before starting:**
 
-- **Linux**: Uses `pkexec` for privilege elevation
-- **macOS**: Prompts for admin password
-- **Windows**: Requires running as Administrator
+### Linux
+Run from terminal with sudo or pkexec:
+```bash
+sudo /path/to/usb-creator
+# or
+pkexec /path/to/usb-creator
+```
+
+### macOS
+Run from terminal with sudo:
+```bash
+sudo /Applications/USB\ Creator.app/Contents/MacOS/USB\ Creator
+```
+Note: macOS uses raw device paths (`/dev/rdiskN`) internally for faster write speeds.
+
+### Windows
+Right-click the application and select **"Run as administrator"**.
+
+## Error Handling
+
+- **Permission denied:** The app was not launched with administrator privileges. See Permissions section.
+- **Verification failed: data mismatch detected:** Post-write verification found the written data differs from the source. The USB drive may be faulty or the write was interrupted.
+- **Device not found or not removable:** The selected device was unplugged or is not a removable USB device.
 
 ## Disclaimer
 
@@ -94,11 +117,11 @@ AGPL-3.0 - See [LICENSE](LICENSE)
 
 Planned features for future releases:
 
-- **Compressed Image Support** - Write `.iso.gz`, `.iso.xz`, `.img.zip` directly without manual extraction
-- **Multi-Device Write** - Clone the same image to multiple USB drives simultaneously
-- **Bootable Validation** - Verify written USB is bootable (BIOS/UEFI detection)
-- **Persistent Volume** - Create persistence partition for Linux live USBs
-- **Ventoy-Style Multi-Boot** - Multiple ISOs on one USB with boot menu
+- **Compressed Image Support** — Write `.iso.gz`, `.iso.xz`, `.img.zip` directly without manual extraction
+- **Multi-Device Write** — Clone the same image to multiple USB drives simultaneously
+- **Bootable Validation** — Verify written USB is bootable (BIOS/UEFI detection)
+- **Persistent Volume** — Create persistence partition for Linux live USBs
+- **Ventoy-Style Multi-Boot** — Multiple ISOs on one USB with boot menu
 
 ## Contributing
 
