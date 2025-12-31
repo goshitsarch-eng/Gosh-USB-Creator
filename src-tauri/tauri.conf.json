@@ -65,11 +65,7 @@
         "type": "embedBootstrapper"
       },
       "nsis": {
-        "installMode": "currentUser",
-        "displayLanguageSelector": true,
-        "languages": ["English", "German", "French", "Spanish", "Portuguese", "Japanese", "Korean", "SimpChinese", "TradChinese"],
-        "license": "LICENSE",
-        "installerIcon": "icons/icon.ico"
+        "installMode": "perMachine"
       }
     }
   }
