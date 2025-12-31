@@ -27,7 +27,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["dmg", "app"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -44,7 +44,10 @@
       }
     },
     "macOS": {
-      "minimumSystemVersion": "10.13"
+      "entitlements": "entitlements.plist",
+      "minimumSystemVersion": "10.13",
+      "signingIdentity": "Developer ID Application: Vaughan Jones (7PP92382T8)",
+      "providerShortName": "7PP92382T8"
     },
     "windows": {
       "webviewInstallMode": {

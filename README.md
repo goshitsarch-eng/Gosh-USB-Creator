@@ -2,6 +2,12 @@
 
 A cross-platform USB flash drive creator for Windows, Linux, and macOS. Built with Tauri v2 (Rust) and React/TypeScript.
 
+## Philosophy
+
+Gosh apps are built with a Linux-first mindset: simplicity, transparency, and user control.
+
+We also provide Windows and macOS builds not as a compromise, but as an on-ramp. Many people are curious about Linux but still live on other platforms day-to-day. If these tools help someone get comfortable and eventually make the jump, we're happy to meet them where they are.
+
 ## Features
 
 ### Standard Mode
@@ -69,14 +75,15 @@ Writing to raw block devices requires elevated privileges:
 - **macOS**: Prompts for admin password
 - **Windows**: Requires running as Administrator
 
+## Disclaimer
+
+This application is an independent project and is not sponsored by, endorsed by, or affiliated with GitHub or GitHub, Inc.
+
+This software is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). It is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability or fitness for a particular purpose. Use at your own risk.
+
 ## License
 
 AGPL-3.0 - See [LICENSE](LICENSE)
-
-This license requires:
-- Source code must be provided when distributing modified versions
-- Network use (SaaS) must provide source access
-- No closed-source forks
 
 ## Roadmap
 
