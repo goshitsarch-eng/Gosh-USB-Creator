@@ -27,7 +27,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["dmg", "app"],
+    "targets": "all",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -41,8 +41,19 @@
     "linux": {
       "appimage": {
         "bundleMediaFramework": false
+      },
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0"],
+        "section": "utils",
+        "priority": "optional"
+      },
+      "rpm": {
+        "release": "1"
       }
     },
+    "category": "Utility",
+    "shortDescription": "Cross-platform USB flash drive creator",
+    "longDescription": "A fast, lightweight USB creator for writing ISO/IMG files to USB drives. Features include real-time progress tracking, checksum verification (SHA-256, MD5), and support for Windows, Linux, and macOS images.",
     "macOS": {
       "entitlements": "entitlements.plist",
       "minimumSystemVersion": "10.13",
