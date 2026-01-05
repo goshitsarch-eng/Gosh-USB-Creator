@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,7 +19,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Setup Rust
@@ -75,7 +75,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-flatpak:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -83,7 +83,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Setup Rust
@@ -94,7 +94,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y flatpak flatpak-builder
           sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-          sudo flatpak install -y flathub org.gnome.Platform//46 org.gnome.Sdk//46
+          sudo flatpak install -y flathub org.gnome.Platform//48 org.gnome.Sdk//48
 
       - name: Install Linux build dependencies
         run: |
@@ -116,7 +116,7 @@ jobs:
           cat > com.gosh.usb-creator.yml << 'EOF'
           app-id: com.gosh.usb-creator
           runtime: org.gnome.Platform
-          runtime-version: '46'
+          runtime-version: '48'
           sdk: org.gnome.Sdk
           command: gosh-usb-creator
           finish-args:

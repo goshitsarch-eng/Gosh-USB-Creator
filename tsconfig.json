@@ -10,14 +10,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "verbatimModuleSyntax": true,
+    "types": ["svelte"]
   },
-  "include": ["src"],
+  "include": ["src/**/*.ts", "src/**/*.svelte"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
