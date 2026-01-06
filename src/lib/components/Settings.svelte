@@ -67,7 +67,7 @@
   <div class="card-header">About</div>
   <div class="card-body settings-about">
     <p><strong>Gosh USB Creator</strong></p>
-    <p class="settings-meta">Version 2.0.0</p>
+    <p class="settings-meta">Version 2.0.1</p>
     <p class="settings-meta">AGPL-3.0</p>
   </div>
 </div>
