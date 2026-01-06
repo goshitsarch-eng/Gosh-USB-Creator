@@ -57,7 +57,7 @@
     "macOS": {
       "entitlements": "entitlements.plist",
       "minimumSystemVersion": "10.13",
-      "signingIdentity": "Developer ID Application: Vaughan Jones (7PP92382T8)",
+      "signingIdentity": null,
       "providerShortName": "7PP92382T8"
     },
     "windows": {
