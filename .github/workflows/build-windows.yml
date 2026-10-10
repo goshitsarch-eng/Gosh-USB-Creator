@@ -1,10 +1,7 @@
-name: Build Windows Packages
+name: Legacy reference - Build Windows Packages
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 permissions:
   contents: write

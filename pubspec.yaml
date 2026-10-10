@@ -1,0 +1,30 @@
+name: gosh_usb_creator
+description: Gosh USB Creator desktop image writer.
+publish_to: none
+version: 3.0.0+1
+environment:
+  sdk: '>=3.9.2 <4.0.0'
+  flutter: '>=3.38.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  gosh_core:
+    path: packages/gosh_core
+  file_selector: ^1.1.0
+  desktop_drop: ^0.7.0
+  shared_preferences: ^2.5.3
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  window_manager: ^0.5.1
+  local_notifier: ^0.1.6
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - LICENSE
+    - assets/rust_licenses.json

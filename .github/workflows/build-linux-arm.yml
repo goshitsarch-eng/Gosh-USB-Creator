@@ -1,10 +1,7 @@
-name: Build Linux ARM Packages
+name: Legacy reference - Build Linux ARM Packages
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 permissions:
   contents: write

@@ -27,3 +27,18 @@ npm-debug.log*
 # Tauri
 src-tauri/WixTools
 src-tauri/tauri.conf.json.bak
+
+# Flutter and Rust migration outputs
+.dart_tool/
+.flutter-plugins-dependencies
+build/
+**/target/
+**/flutter/ephemeral/
+**/Flutter/ephemeral/
+**/Pods/
+**/.symlinks/
+**/xcuserdata/
+.flatpak-builder/
+flatpak-build/
+flatpak-repo/
+release/

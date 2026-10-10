@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Gosh USB Creator
+Comment=Write and verify disk images on removable USB drives
+Exec=gosh-usb-creator
+Icon=com.gosh.usb_creator
+Terminal=false
+Type=Application
+Categories=System;
+Keywords=USB;ISO;image;flash;
+StartupWMClass=com.gosh.usb_creator

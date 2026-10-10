@@ -1,0 +1,129 @@
+name: Flutter desktop
+on:
+  push:
+    branches: [main, 'rewrite/**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            target: linux
+            arch: x64
+          - os: ubuntu-24.04-arm
+            target: linux
+            arch: arm64
+          - os: windows-2025
+            target: windows
+            arch: x64
+          - os: macos-15
+            target: macos
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    env:
+      FLUTTER_SUPPRESS_ANALYTICS: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned stable Flutter SDK
+        shell: bash
+        run: |
+          git clone --depth 1 --branch 3.47.7 https://github.com/flutter/flutter.git "$RUNNER_TEMP/flutter"
+          test "$(git -C "$RUNNER_TEMP/flutter" rev-parse HEAD)" = abaf9c523780a608bd46686fd5e53740a07077f8
+          git -C "$RUNNER_TEMP/flutter" checkout -b stable
+          echo "$RUNNER_TEMP/flutter/bin" >> "$GITHUB_PATH"
+      - run: flutter --version
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: packages/gosh_core/rust
+      - if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev libnotify-dev xvfb rpm
+      - run: flutter pub get --enforce-lockfile
+      - run: dart format --output=none --set-exit-if-changed lib test integration_test packages/gosh_core/lib packages/gosh_core/hook
+      - run: flutter analyze
+      - run: cargo fmt --manifest-path packages/gosh_core/rust/Cargo.toml --check
+      - run: cargo clippy --locked --manifest-path packages/gosh_core/rust/Cargo.toml --all-targets --all-features -- -D warnings
+      - run: cargo test --locked --manifest-path packages/gosh_core/rust/Cargo.toml
+      - run: flutter test test
+      - if: runner.os == 'Linux'
+        run: xvfb-run -a flutter test integration_test/core_test.dart -d linux
+      - if: runner.os != 'Linux'
+        run: flutter test integration_test/core_test.dart -d ${{ matrix.target }}
+      - run: flutter build ${{ matrix.target }} --release
+      - if: runner.os == 'Linux'
+        run: |
+          mkdir -p release
+          tar -C build/linux/${{ matrix.arch }}/release -czf release/gosh-usb-creator-linux-${{ matrix.arch }}.tar.gz bundle
+          tool=$(packaging/linux/fetch-appimagetool.sh "$RUNNER_TEMP/appimagetool")
+          APPIMAGETOOL="$tool" packaging/linux/package.sh
+      - if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:GOSH_VERSION = (Select-String -Path pubspec.yaml -Pattern '^version: (.+)\+').Matches.Groups[1].Value
+          & 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' packaging/windows/installer.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - if: runner.os == 'macOS'
+        run: packaging/macos/package.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gosh-usb-creator-${{ matrix.target }}-${{ matrix.arch }}
+          path: release/*
+          if-no-files-found: error
+  flatpak:
+    needs: desktop
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            arch: x64
+          - os: ubuntu-24.04-arm
+            arch: arm64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: gosh-usb-creator-linux-${{ matrix.arch }}
+          path: release
+      - run: |
+          mkdir -p build/flatpak
+          tar -xzf release/gosh-usb-creator-linux-${{ matrix.arch }}.tar.gz -C build/flatpak
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user -y flathub org.gnome.Platform//49 org.gnome.Sdk//49
+          flatpak-builder --user --force-clean --repo=flatpak-repo flatpak-build packaging/flatpak/com.gosh.usb_creator.yml
+          flatpak build-bundle flatpak-repo release/gosh-usb-creator-${{ matrix.arch }}.flatpak com.gosh.usb_creator
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gosh-usb-creator-flatpak-${{ matrix.arch }}
+          path: release/*.flatpak
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [desktop, flatpak]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: gosh-usb-creator-*
+          merge-multiple: true
+          path: release
+      - name: Artifact checksums
+        working-directory: release
+        run: sha256sum * > SHA256SUMS
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          fail_on_unmatched_files: true

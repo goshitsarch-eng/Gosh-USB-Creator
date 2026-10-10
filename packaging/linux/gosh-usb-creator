@@ -1,0 +1,2 @@
+#!/bin/sh
+exec /app/lib/gosh-usb-creator/gosh_usb_creator "$@"

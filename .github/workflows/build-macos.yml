@@ -1,10 +1,7 @@
-name: Build macOS Packages
+name: Legacy reference - Build macOS Packages
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*'
 
 permissions:
   contents: write

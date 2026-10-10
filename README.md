@@ -1,128 +1,53 @@
 # Gosh USB Creator
 
-A cross-platform USB flash drive creator for Windows, Linux, and macOS. Built with Tauri v2 (Rust) and React/TypeScript.
+A Flutter desktop interface and independent Rust core for writing and verifying
+ISO/IMG images on removable USB drives. Version 3.0.0 is the migration candidate.
+It is **not yet a verified cross-platform production release**; see
+[PLATFORM_SUPPORT.md](PLATFORM_SUPPORT.md) and [MIGRATION_AUDIT.md](MIGRATION_AUDIT.md).
 
-## Philosophy
+Choose an image, optionally compare its SHA-256 or MD5 checksum, select a drive,
+and confirm the destructive write. Read-back verification, progress, cancellation,
+light/dark/system appearance, preferences, auto-eject and notifications are included.
+Advanced mode shows signature details and post-write settings. Signature detection
+is a heuristic and does not establish bootability or trust.
 
-Gosh apps are built with a Linux-first mindset: simplicity, transparency, and user control.
+## Development
 
-We also provide Windows and macOS builds not as a compromise, but as an on-ramp. Many people are curious about Linux but still live on other platforms day-to-day. If these tools help someone get comfortable and eventually make the jump, we're happy to meet them where they are.
+Stable Flutter 3.47.7 / Dart 3.13.5 and stable Rust are used. On Debian/Ubuntu:
 
-## Screenshots
-
-![Screenshot 1](screenshots/img1.png)
-![Screenshot 2](screenshots/img2.png)
-
-## Features
-
-### Standard Mode
-- Write ISO/IMG files to USB drives
-- SHA-256 and MD5 checksum calculation
-- Post-write verification (reads back written data and compares byte-by-byte to ensure write integrity)
-- Cross-platform: Windows, Linux, macOS
-- Light/Dark/System theme support
-- No telemetry, accounts, or cloud features
-
-### Advanced Mode
-All Standard features plus:
-- **Pre-write image validation** — Checks source file before writing to confirm it's a valid disk image (ISO 9660, MBR, or GPT format). Click the format name for an explanation of what it means.
-- **Size check** — Warns if image file is larger than USB device capacity
-- **Auto-eject** — Automatically ejects USB device after successful write
-- **Notifications** — System notification when write completes
-
-## Requirements
-
-### All Platforms
-- [Node.js](https://nodejs.org/) 18+
-- [Rust](https://rustup.rs/) 1.70+
-
-### Linux
-- `libwebkit2gtk-4.1-dev`
-- `libappindicator3-dev`
-- `librsvg2-dev`
-
-On Debian/Ubuntu:
-```bash
-sudo apt install libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev
+```sh
+sudo apt-get install clang cmake ninja-build pkg-config libgtk-3-dev libnotify-dev
+flutter pub get --enforce-lockfile
+flutter run -d linux
 ```
 
-### Windows
-- WebView2 (included in Windows 10/11)
+Flutter's native-asset hook builds and bundles Rust automatically. Node.js and a
+WebView are not used by the new application. The old `src`, `src-tauri` and npm
+files remain temporary reference material; their removal is pending explicit
+cleanup authorization and outstanding platform QA. Do not use them for the new
+app's development or releases.
 
-### macOS
-- Xcode Command Line Tools
-- Minimum macOS 10.13 (High Sierra)
+See [BUILDING.md](BUILDING.md) for platform builds and validation,
+[ARCHITECTURE.md](ARCHITECTURE.md) for ownership and the FFI contract, and
+[the permission proposal](docs/macos-permissions-proposal.md) for the approved
+macOS raw-device permission decision.
 
-## Building
+## Device permissions
 
-```bash
-# Install dependencies
-npm install
+Linux uses UDisks2 for authorized unmount/open/eject and can also use existing
+raw-device permissions. A running UDisks2 service and desktop authentication agent
+are prerequisites for authorization prompts. System disks are excluded.
+Windows currently requires administrator privileges for physical drives. The macOS
+App Sandbox exception was explicitly approved for raw-device access; Unix device
+write permission still requires elevation. Flatpak uses native file portals and an
+explicit UDisks2 system-bus permission; sandboxed startup and the native portal chooser were exercised. External file
+exports remain blocked by the cloud container's denied FUSE mounts.
 
-# Development
-npm run tauri dev
-
-# Production build
-npm run tauri build
-```
-
-## Usage
-
-1. **Select ISO** — Click or drag an ISO/IMG file into the app
-2. **Verify checksum** (optional) — Calculate SHA-256 or MD5 and compare against expected value
-3. **Select USB device** — Choose the target drive from the detected removable devices
-4. **Write** — Click "Write" and confirm the warning dialog (requires admin privileges)
-
-The device list auto-refreshes every 8 seconds. Writing uses 4 MB blocks for optimal performance.
-
-## Permissions
-
-Writing to raw block devices requires elevated privileges. **The app must be launched with admin rights before starting:**
-
-### Linux
-Run from terminal with sudo or pkexec:
-```bash
-sudo /path/to/usb-creator
-# or
-pkexec /path/to/usb-creator
-```
-
-### macOS
-Run from terminal with sudo:
-```bash
-sudo /Applications/USB\ Creator.app/Contents/MacOS/USB\ Creator
-```
-Note: macOS uses raw device paths (`/dev/rdiskN`) internally for faster write speeds.
-
-### Windows
-Right-click the application and select **"Run as administrator"**.
-
-## Error Handling
-
-- **Permission denied:** The app was not launched with administrator privileges. See Permissions section.
-- **Verification failed: data mismatch detected:** Post-write verification found the written data differs from the source. The USB drive may be faulty or the write was interrupted.
-- **Device not found or not removable:** The selected device was unplugged or is not a removable USB device.
-
-## Disclaimer
-
-This application is an independent project and is not sponsored by, endorsed by, or affiliated with GitHub or GitHub, Inc.
-
-This software is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). It is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability or fitness for a particular purpose. Use at your own risk.
+A write erases the selected target. Hardware testing must use a disposable USB
+drive. The app does not claim that an image is bootable, safe, or from a trusted
+publisher. It has no accounts, application telemetry, or cloud service dependency.
 
 ## License
 
-AGPL-3.0 - See [LICENSE](LICENSE)
-
-## Roadmap
-
-Planned features for future releases:
-
-- **Compressed Image Support** — Write `.iso.gz`, `.iso.xz`, `.img.zip` directly without manual extraction
-- **Multi-Device Write** — Clone the same image to multiple USB drives simultaneously
-- **Bootable Validation** — Verify written USB is bootable (BIOS/UEFI detection)
-- **Persistent Volume** — Create persistence partition for Linux live USBs
-- **Ventoy-Style Multi-Boot** — Multiple ISOs on one USB with boot menu
-
-## Contributing
-
-Contributions welcome. Please open an issue first for major changes.
+AGPL-3.0; see [LICENSE](LICENSE). Existing branding and application purpose are
+preserved. Third-party licenses appear in the application's license page.
