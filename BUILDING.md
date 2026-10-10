@@ -110,3 +110,7 @@ cargo metadata --locked --format-version 1 --manifest-path packages/gosh_core/ru
 AppImage runtime/tool digests are pinned in the fetch script. If the upstream
 continuous runtime changes, checksum verification fails; review the producer's
 release metadata and deliberately update the pin. Do not skip verification.
+
+Run Flutter builds and native integration tests sequentially. Quit an active
+`flutter run` session before rebuilding or testing the same bundle, because
+Flutter and native-asset hooks share output directories.

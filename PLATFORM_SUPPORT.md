@@ -2,7 +2,8 @@
 
 Version 3.0.0 is an implemented migration candidate. It is not a verified
 production release. Evidence below comes from this Debian 13 x86_64 cloud
-instance; configured CI jobs have not yet run.
+instance; native CI jobs were attempted but blocked before startup by a
+GitHub account billing lock.
 
 | Target | Implemented and configured | Actually verified here | Outstanding release gates |
 |---|---|---|---|
@@ -34,4 +35,8 @@ capabilities; extracted AppImage launch can be checked separately.
 
 See [docs/QA.md](docs/QA.md) for checks and [BUILDING.md](BUILDING.md) for exact
 build/package commands. Signed Windows/macOS release credentials are not provided.
-No physical device write, remote CI execution or release publication is claimed.
+No physical device write, native CI job execution or release publication is claimed.
+
+The native CI run is currently blocked before job startup by the GitHub owner
+account billing lock. See [the validation record](docs/QA.md#native-ci-blocker).
+Configured target jobs do not establish native build or test success.

@@ -21,7 +21,8 @@ jobs with platform QA. The reference was audited before rewriting; see
 | Flatpak portals | Real GTK portal chooser opened; document portal FUSE mount failed with Operation not permitted; arbitrary host-file export is not claimed |
 | Windows/macOS native builds, installers and UI | Unrun: no corresponding OS environment available here |
 | Disposable USB operations | Unrun: no authorized disposable hardware attached |
-| Remote CI and tagged release | Configured; not executed/published |
+| Remote CI | Branch pushed; all desktop jobs blocked before starting by GitHub account billing lock; Flatpak dependent jobs skipped |
+| Tagged release | Configured; no tag or release published |
 
 Native screenshots in `docs/screenshots` are captured app windows, not mockups.
 Xvfb provides X11 only. It cannot establish Wayland, real desktop theme watching,
@@ -49,3 +50,12 @@ Check known-byte writes, read-back, wrong/changed checksum, insufficient capacit
 source-on-target rejection, cancellation, unplugging, failed authorization,
 device identity changes and concurrent writers. Capture OS/toolchain versions and
 outcomes in this record before promoting the candidate to a production release.
+
+## Native CI blocker
+
+The [first native workflow run](https://github.com/goshitsarch-eng/Gosh-USB-Creator/actions/runs/38020625451)
+for commit `972d246385fea08af8c1b39f3c438cc463e74c69` could not start any
+desktop job. Each check annotation reports: “The job was not started because
+your account is locked due to a billing issue.” This is an external access
+blocker, not evidence that native compilation passed or failed. Restore Actions
+access and rerun all jobs; fix any resulting build/test failures before promotion.
